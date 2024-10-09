@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Kalkulator Trading Forex Kontol</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: #f0f2f5;
+            transition: background 0.3s;
+        }
+        .dark-mode {
+            background: #121212;
+            color: #ffffff;
+        }
+        .card {
+            background: #ffffff;
+            transition: background 0.3s, color 0.3s;
+        }
+        .dark-mode .card {
+            background: #1e1e1e;
+            color: #ffffff;
+        }
+        .tooltip-inner {
+            max-width: 250px;
+            text-align: left;
+        }
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 10px;
+        }
+        .jurnal-trading {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container my-5">
+    <div class="toggle-switch">
+        <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="themeSwitch">
+            <label class="form-check-label" for="themeSwitch">Tema Gelap</label>
+        </div>
+    </div>
+    
+    <div class="card shadow-lg">
+        <div class="card-header text-center">
+            <h2>Kalkulator Trading Forex kontol</h2>
+        </div>
+        <div class="card-body">
+            <form id="tradingForm">
+                <div class="row g-3">
+                    <!-- Pasangan Mata Uang -->
+                    <div class="col-md-6">
+                        <label for="pair" class="form-label">Pasangan Mata Uang (Currency Pair) 
+                            <span class="text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Pilih pasangan mata uang yang ingin Anda tradingkan.">
+                                <i class="bi bi-info-circle"></i>
+                            </span>
+                        </label>
+                        <select class="form-select" id="pair" required>
+                            <option value="EURUSD">EUR/USD</option>
+                            <option value="GBPUSD">GBP/USD</option>
+                            <option value="USDJPY">USD/JPY</option>
+                            <option value="USDCHF">USD/CHF</option>
+                            <option value="AUDUSD">AUD/USD</option>
+                            <option value="USDCAD">USD/CAD</option>
+                            <option value="NZDUSD">NZD/USD</option>
+                            <option value="XAUUSD">XAU/USD (Gold)</option>
+                            <!-- Tambahkan pasangan lainnya sesuai kebutuhan -->
+                        </select>
+                    </div>
+                    <!-- Modal -->
+                    <div class="col-md-6">
+                        <label for="modal" class="form-label">Modal (USD) 
+                            <span class="text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Jumlah modal yang Anda miliki untuk trading.">
+                                <i class="bi bi-info-circle"></i>
+                            </span>
+                        </label>
+                        <input type="number" class="form-control" id="modal" placeholder="Masukkan modal Anda" min="1" required>
+                    </div>
+                    <!-- Leverage -->
+                    <div class="col-md-6">
+                        <label for="leverage" class="form-label">Leverage (1:...) 
+                            <span class="text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Rasio leverage yang Anda gunakan, misalnya 1000 untuk 1:1000.">
+                                <i class="bi bi-info-circle"></i>
+                            </span>
+                        </label>
+                        <input type="number" class="form-control" id="leverage" placeholder="Misal 1000" min="1" required>
+                    </div>
+                    <!-- Harga Pasangan -->
+                    <div class="col-md-6">
+                        <label for="harga" class="form-label">Harga Pasangan (Bid Price) 
+                            <span class="text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Harga bid saat ini untuk pasangan mata uang yang dipilih.">
+                                <i class="bi bi-info-circle"></i>
+                            </span>
+                        </label>
+                        <input type="number" class="form-control" id="harga" placeholder="Misal 1.2000" step="0.0001" required>
+                    </div>
+                    <!-- Persentase Risiko -->
+                    <div class="col-md-6">
+                        <label for="risiko" class="form-label">Persentase Risiko per Trade (%) 
+                            <span class="text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Persentase modal yang siap Anda risikokan per trade, misalnya 1%.">
+                                <i class="bi bi-info-circle"></i>
+                            </span>
+                        </label>
+                        <input type="number" class="form-control" id="risiko" placeholder="Misal 1" min="0" max="100" step="0.1" required>
+                    </div>
+                    <!-- Target Keuntungan -->
+                    <div class="col-md-6">
+                        <label for="target" class="form-label">Target Keuntungan (%) 
+                            <span class="text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Persentase keuntungan yang ingin Anda capai, misalnya 1000%.">
+                                <i class="bi bi-info-circle"></i>
+                            </span>
+                        </label>
+                        <input type="number" class="form-control" id="target" placeholder="Misal 1000" min="0" max="10000" step="1" required>
+                    </div>
+                    <!-- Spread -->
+                    <div class="col-md-6">
+                        <label for="spread" class="form-label">Spread (Pips) 
+                            <span class="text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Spread yang ditawarkan oleh broker dalam pips, misalnya 2 pips.">
+                                <i class="bi bi-info-circle"></i>
+                            </span>
+                        </label>
+                        <input type="number" class="form-control" id="spread" placeholder="Misal 2" min="0" step="0.1" required>
+                    </div>
+                    <!-- Komisi -->
+                    <div class="col-md-6">
+                        <label for="komisi" class="form-label">Komisi Broker (USD per Lot) 
+                            <span class="text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Komisi yang dikenakan broker per lot yang diperdagangkan. Jika broker tidak mengenakan komisi, isi 0.">
+                                <i class="bi bi-info-circle"></i>
+                            </span>
+                        </label>
+                        <input type="number" class="form-control" id="komisi" placeholder="Misal 0.5" min="0" step="0.01" required>
+                    </div>
+                    <!-- Swap/Rollover -->
+                    <div class="col-md-6">
+                        <label for="swap" class="form-label">Swap/Rollover (USD per Lot) 
+                            <span class="text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Biaya swap atau rollover yang dikenakan broker per lot untuk mempertahankan posisi terbuka semalaman. Masukkan negatif untuk biaya, positif untuk kredit. Jika tidak ada swap, isi 0.">
+                                <i class="bi bi-info-circle"></i>
+                            </span>
+                        </label>
+                        <input type="number" class="form-control" id="swap" placeholder="Misal -0.1" step="0.01" required>
+                    </div>
+                    <!-- Ukuran Lot -->
+                    <div class="col-md-6">
+                        <label for="lot" class="form-label">Ukuran Lot:</label>
+                        <select class="form-select" id="lot">
+                            <option value="100">Standard Lot (100 unit)</option>
+                            <option value="10">Mini Lot (10 unit)</option>
+                            <option value="1" selected>Mikro Lot (1 unit)</option>
+                            <option value="0.1">Nano Lot (0.1 unit)</option>
+                        </select>
+                    </div>
+                    <!-- Analisis Fundamental -->
+                    <div class="col-12">
+                        <label for="fundamental" class="form-label">Analisis Fundamental 
+                            <span class="text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Masukkan faktor-faktor fundamental seperti indikator ekonomi, berita penting, atau event yang dapat mempengaruhi pasar.">
+                                <i class="bi bi-info-circle"></i>
+                            </span>
+                        </label>
+                        <textarea class="form-control" id="fundamental" rows="3" placeholder="Masukkan analisis fundamental Anda, misalnya laporan GDP, keputusan suku bunga, dll."></textarea>
+                    </div>
+                    <!-- Tambahan: Kalender Ekonomi Manual -->
+                    <div class="col-12">
+                        <label class="form-label">Kalender Ekonomi Manual:</label>
+                        <div id="manualEconomicEvents" class="mb-3">
+                            <button type="button" class="btn btn-sm btn-outline-primary" onclick="addEconomicEvent()">Tambah Event</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-4 text-center">
+                    <button type="button" class="btn btn-success btn-lg" onclick="hitung()">Hitung</button>
+                    <button type="button" class="btn btn-secondary btn-lg" onclick="resetForm()">Reset</button>
+                    <button type="button" class="btn btn-primary btn-lg" onclick="exportCSV()">Export CSV</button>
+                </div>
+            </form>
+            
+            <!-- Hasil Perhitungan -->
+            <div class="results mt-4" id="results" style="display:none;">
+                <h4>Hasil Perhitungan:</h4>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Ukuran Lot yang Direkomendasikan:</strong> <span id="hasilLot"></span> lot</p>
+                        <p><strong>Nilai Pip (USD):</strong> $<span id="hasilPip"></span></p>
+                        <p><strong>Risiko per Trade:</strong> $<span id="hasilRisiko"></span></p>
+                        <p><strong>Stop Loss (Pips):</strong> <span id="hasilStopLoss"></span> pips</p>
+                        <p><strong>Spread (USD):</strong> $<span id="hasilSpreadUSD"></span></p>
+                        <p><strong>Target Pip Minimum Rekomendasi:</strong> <span id="hasilTargetMinPips"></span> pips</p>
+                        <p><strong>Target Stop Loss Rekomendasi:</strong> <span id="hasilStopLossMinPips"></span> pips</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Target Keuntungan (USD):</strong> $<span id="hasilTargetUSD"></span></p>
+                        <p><strong>Target Keuntungan (Pips):</strong> <span id="hasilTargetPips"></span> pips</p>
+                        <p><strong>Komisi Broker (USD):</strong> $<span id="hasilKomisi"></span></p>
+                        <p><strong>Swap/Rollover (USD):</strong> $<span id="hasilSwap"></span></p>
+                        <p><strong>Total Biaya:</strong> $<span id="hasilTotalBiaya"></span></p>
+                        <p><strong>Keuntungan Bersih (USD):</strong> $<span id="hasilNetProfit"></span></p>
+                        <p><strong>Rasio Risiko vs. Reward:</strong> <span id="hasilRasio"></span>:1</p>
+                        <p><strong>Analisis Fundamental:</strong> <span id="hasilFundamental"></span></p>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="riskRewardChart"></canvas>
+                </div>
+                <!-- Jurnal Trading -->
+                <div class="mt-4">
+                    <h5>Jurnal Trading Anda:</h5>
+                    <div class="jurnal-trading list-group" id="tradeJournal">
+                        <!-- Isi jurnal akan ditambahkan di sini -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS and dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Initialize Bootstrap tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+
+        // Theme Toggle
+        const themeSwitch = document.getElementById('themeSwitch');
+        themeSwitch.addEventListener('change', () => {
+            document.body.classList.toggle('dark-mode');
+        });
+
+        // Dictionary untuk nilai pip per pasangan mata uang
+        const pipValues = {
+            "EURUSD": 0.0001,
+            "GBPUSD": 0.0001,
+            "USDJPY": 0.01,
+            "USDCHF": 0.0001,
+            "AUDUSD": 0.0001,
+            "USDCAD": 0.0001,
+            "NZDUSD": 0.0001,
+            "XAUUSD": 0.1 // 1 pip = $0.1 untuk XAUUSD
+            // Tambahkan pasangan mata uang lainnya jika diperlukan
+        };
+
+        // Kalkulator Trading
+        function hitung() {
+            // Mengambil nilai input
+            const pair = document.getElementById('pair').value;
+            const modal = parseFloat(document.getElementById('modal').value);
+            const leverage = parseFloat(document.getElementById('leverage').value);
+            const harga = parseFloat(document.getElementById('harga').value);
+            const risikoPersen = parseFloat(document.getElementById('risiko').value);
+            const targetPersen = parseFloat(document.getElementById('target').value);
+            const spreadPips = parseFloat(document.getElementById('spread').value);
+            const komisiPerLot = parseFloat(document.getElementById('komisi').value);
+            const swapPerLot = parseFloat(document.getElementById('swap').value);
+            const ukuranLot = parseFloat(document.getElementById('lot').value);
+            const fundamental = document.getElementById('fundamental').value;
+            const economicEvents = getEconomicEvents();
+
+            // Validasi input
+            if (isNaN(modal) || isNaN(leverage) || isNaN(harga) || isNaN(risikoPersen) || isNaN(targetPersen) || isNaN(spreadPips) || isNaN(komisiPerLot) || isNaN(swapPerLot)) {
+                alert("Harap isi semua bidang dengan benar.");
+                return;
+            }
+
+            // Mendapatkan nilai pip berdasarkan pasangan mata uang
+            const pipValue = pipValues[pair] || 0.0001; // Default 0.0001 jika pasangan tidak ada di dictionary
+
+            // 1. Menghitung Ukuran Lot yang Direkomendasikan
+            const totalKontrol = modal * leverage;
+            let ukuranLotDirekomendasi = totalKontrol / (harga * ukuranLot);
+
+            // Membulatkan ke bawah untuk menghindari over-leverage
+            ukuranLotDirekomendasi = Math.floor(ukuranLotDirekomendasi * 100) / 100;
+
+            // 2. Menghitung Nilai Pip
+            const nilaiPip = pipValue * ukuranLot; // Nilai pip per lot
+
+            // 3. Menghitung Risiko per Trade
+            const risikoPerTrade = (modal * (risikoPersen / 100)).toFixed(2);
+
+            // 4. Menghitung Stop Loss dalam Pips
+            const stopLossPips = (risikoPerTrade / nilaiPip).toFixed(2);
+
+            // 5. Menghitung Spread dalam USD
+            const spreadUSD = (spreadPips * nilaiPip).toFixed(2);
+
+            // 6. Menghitung Target Keuntungan dalam USD
+            const targetUSD = (modal * (targetPersen / 100)).toFixed(2);
+
+            // 7. Menghitung Target Keuntungan dalam Pips
+            const targetPips = (targetUSD / nilaiPip).toFixed(2);
+
+            // 8. Menghitung Komisi Total
+            const komisiTotal = (komisiPerLot * ukuranLotDirekomendasi).toFixed(2);
+
+            // 9. Menghitung Swap/Rollover Total
+            const swapTotal = (swapPerLot * ukuranLotDirekomendasi).toFixed(2);
+
+            // 10. Menghitung Total Biaya
+            const totalBiaya = (parseFloat(spreadUSD) + parseFloat(komisiTotal) + parseFloat(swapTotal)).toFixed(2);
+
+            // 11. Menghitung Keuntungan Bersih
+            const netProfit = (parseFloat(targetUSD) - parseFloat(totalBiaya)).toFixed(2);
+
+            // 12. Menghitung Rasio Risiko vs. Reward
+            const rasio = (targetPips / stopLossPips).toFixed(2);
+
+            // 13. Menghitung Target Pip Minimum Rekomendasi
+            // Misalnya, target pip minimum adalah spread pips + 1 pips untuk profit
+            const targetMinPips = (spreadPips + 1).toFixed(2);
+
+            // 14. Menghitung Target Stop Loss Rekomendasi
+            // Misalnya, target stop loss rekomendasi tidak melebihi 2x spread pips
+            const stopLossMinPips = (spreadPips * 2).toFixed(2);
+
+            // 15. Menyimpan hasil ke jurnal trading
+            const tradeData = {
+                date: new Date().toLocaleString(),
+                pair: pair,
+                lot: ukuranLotDirekomendasi,
+                pipValue: nilaiPip.toFixed(4),
+                risk: risikoPerTrade,
+                stopLossPips: stopLossPips,
+                spreadUSD: spreadUSD,
+                targetUSD: targetUSD,
+                targetPips: targetPips,
+                komisi: komisiTotal,
+                swap: swapTotal,
+                totalBiaya: totalBiaya,
+                netProfit: netProfit,
+                rasio: rasio,
+                targetMinPips: targetMinPips,
+                stopLossMinPips: stopLossMinPips,
+                fundamental: fundamental,
+                economicEvents: economicEvents
+            };
+
+            addToJournal(tradeData);
+
+            // Memberikan notifikasi
+            alert("Perhitungan selesai dan ditambahkan ke jurnal trading Anda!");
+
+            // Menampilkan hasil
+            document.getElementById('hasilLot').innerText = ukuranLotDirekomendasi;
+            document.getElementById('hasilPip').innerText = nilaiPip.toFixed(4);
+            document.getElementById('hasilRisiko').innerText = risikoPerTrade;
+            document.getElementById('hasilStopLoss').innerText = stopLossPips;
+            document.getElementById('hasilSpreadUSD').innerText = spreadUSD;
+            document.getElementById('hasilTargetUSD').innerText = targetUSD;
+            document.getElementById('hasilTargetPips').innerText = targetPips;
+            document.getElementById('hasilKomisi').innerText = komisiTotal;
+            document.getElementById('hasilSwap').innerText = swapTotal;
+            document.getElementById('hasilTotalBiaya').innerText = totalBiaya;
+            document.getElementById('hasilNetProfit').innerText = netProfit;
+            document.getElementById('hasilRasio').innerText = rasio;
+            document.getElementById('hasilTargetMinPips').innerText = targetMinPips;
+            document.getElementById('hasilStopLossMinPips').innerText = stopLossMinPips;
+            document.getElementById('hasilFundamental').innerText = fundamental || "Tidak ada data";
+
+            document.getElementById('results').style.display = 'block';
+
+            // Update Chart
+            updateChart(parseFloat(risikoPerTrade), parseFloat(netProfit));
+        }
+
+        // Menambahkan Event Ekonomi Manual
+        function addEconomicEvent() {
+            const eventContainer = document.getElementById('manualEconomicEvents');
+            const eventCount = eventContainer.querySelectorAll('.economic-event').length + 1;
+            const eventHTML = `
+                <div class="input-group mb-2 economic-event">
+                    <span class="input-group-text">Event ${eventCount}</span>
+                    <input type="text" class="form-control" placeholder="Nama Event" required>
+                    <input type="datetime-local" class="form-control" required>
+                    <button type="button" class="btn btn-danger" onclick="removeEconomicEvent(this)">Hapus</button>
+                </div>
+            `;
+            eventContainer.insertAdjacentHTML('beforeend', eventHTML);
+        }
+
+        // Menghapus Event Ekonomi Manual
+        function removeEconomicEvent(button) {
+            button.parentElement.remove();
+        }
+
+        // Mendapatkan Event Ekonomi Manual
+        function getEconomicEvents() {
+            const events = [];
+            const eventElements = document.querySelectorAll('.economic-event');
+            eventElements.forEach(elem => {
+                const inputs = elem.querySelectorAll('input');
+                const namaEvent = inputs[0].value;
+                const waktuEvent = inputs[1].value;
+                if (namaEvent && waktuEvent) {
+                    events.push({ nama: namaEvent, waktu: waktuEvent });
+                }
+            });
+            return events;
+        }
+
+        // Reset Form
+        function resetForm() {
+            document.getElementById('tradingForm').reset();
+            document.getElementById('results').style.display = 'none';
+            document.getElementById('tradeJournal').innerHTML = '';
+            localStorage.removeItem('tradeJournal');
+            if (chart) {
+                chart.destroy();
+            }
+            // Menghapus semua event ekonomi manual
+            document.querySelectorAll('.economic-event').forEach(elem => elem.remove());
+        }
+
+        // Export CSV
+        function exportCSV() {
+            const hasilLot = document.getElementById('hasilLot').innerText;
+            const hasilPip = document.getElementById('hasilPip').innerText;
+            const hasilRisiko = document.getElementById('hasilRisiko').innerText;
+            const hasilStopLoss = document.getElementById('hasilStopLoss').innerText;
+            const hasilSpreadUSD = document.getElementById('hasilSpreadUSD').innerText;
+            const hasilTargetUSD = document.getElementById('hasilTargetUSD').innerText;
+            const hasilTargetPips = document.getElementById('hasilTargetPips').innerText;
+            const hasilKomisi = document.getElementById('hasilKomisi').innerText;
+            const hasilSwap = document.getElementById('hasilSwap').innerText;
+            const hasilTotalBiaya = document.getElementById('hasilTotalBiaya').innerText;
+            const hasilNetProfit = document.getElementById('hasilNetProfit').innerText;
+            const hasilRasio = document.getElementById('hasilRasio').innerText;
+            const hasilTargetMinPips = document.getElementById('hasilTargetMinPips').innerText;
+            const hasilStopLossMinPips = document.getElementById('hasilStopLossMinPips').innerText;
+            const hasilFundamental = document.getElementById('hasilFundamental').innerText;
+
+            const csvContent = `data:text/csv;charset=utf-8,` +
+                `Pasangan Mata Uang,Ukuran Lot,Nilai Pip,Risiko per Trade,Stop Loss (Pips),Spread (USD),Target Keuntungan (USD),Target Keuntungan (Pips),Komisi Broker (USD),Swap/Rollover (USD),Total Biaya,Keuntungan Bersih (USD),Rasio Risiko vs Reward,Target Pip Minimum Rekomendasi,Target Stop Loss Rekomendasi,Analisis Fundamental\n` +
+                `${document.getElementById('pair').value},${hasilLot},${hasilPip},${hasilRisiko},${hasilStopLoss},${hasilSpreadUSD},${hasilTargetUSD},${hasilTargetPips},${hasilKomisi},${hasilSwap},${hasilTotalBiaya},${hasilNetProfit},${hasilRasio},${hasilTargetMinPips},${hasilStopLossMinPips},"${hasilFundamental}"`;
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "hasil_trading_forex.csv");
+            document.body.appendChild(link); // Required for FF
+
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Jurnal Trading: Menambahkan data ke jurnal
+        function addToJournal(tradeData) {
+            let journal = JSON.parse(localStorage.getItem('tradeJournal')) || [];
+            journal.push(tradeData);
+            localStorage.setItem('tradeJournal', JSON.stringify(journal));
+
+            displayJournal();
+        }
+
+        // Menampilkan Jurnal Trading
+        function displayJournal() {
+            const journal = JSON.parse(localStorage.getItem('tradeJournal')) || [];
+            const tradeJournal = document.getElementById('tradeJournal');
+            tradeJournal.innerHTML = '';
+
+            journal.forEach((trade, index) => {
+                const eventList = trade.economicEvents.map(event => `${event.nama} (${event.waktu})`).join(', ');
+                tradeJournal.innerHTML += `
+                    <a href="#" class="list-group-item list-group-item-action flex-column align-items-start">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">${trade.pair}</h5>
+                            <small>${trade.date}</small>
+                        </div>
+                        <p class="mb-1">Lot: ${trade.lot}, Pip Value: $${trade.pipValue}, Risk: $${trade.risk}</p>
+                        <small>Stop Loss: ${trade.stopLossPips} pips, Target: ${trade.targetPips} pips, Net Profit: $${trade.netProfit}</small>
+                        <br>
+                        <small>Spread: $${trade.spreadUSD}, Komisi: $${trade.komisi}, Swap: $${trade.swap}, Total Biaya: $${trade.totalBiaya}</small>
+                        <br>
+                        <small>Analisis Fundamental: ${trade.fundamental || "Tidak ada data"}</small>
+                        <br>
+                        <small>Event Ekonomi: ${eventList || "Tidak ada event"}</small>
+                    </a>
+                `;
+            });
+        }
+
+        // Mengambil data jurnal saat halaman dimuat
+        window.onload = function() {
+            displayJournal();
+        };
+
+        // Chart.js Risk vs Reward
+        let chart;
+        function updateChart(risk, reward) {
+            const ctx = document.getElementById('riskRewardChart').getContext('2d');
+
+            if (chart) {
+                chart.destroy();
+            }
+
+            chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Risiko (USD)', 'Reward (USD)'],
+                    datasets: [{
+                        label: 'Perbandingan Risiko vs Reward',
+                        data: [risk, reward],
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.6)',
+                            'rgba(54, 162, 235, 0.6)'
+                        ],
+                        borderColor: [
+                            'rgba(255,99,132,1)',
+                            'rgba(54, 162, 235, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: 'Grafik Risiko vs Reward'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'USD'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+
+</div>
+
+</body>
+</html>
